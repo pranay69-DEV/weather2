@@ -1,0 +1,52 @@
+.monthly-wrapper {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 10px;
+  text-align: center;
+}
+
+.today-box {
+  background: #e6f3ff;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.month-controls button {
+  padding: 6px 12px;
+  margin: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.week-row,
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: 10px;
+}
+
+.week-name {
+  font-weight: bold;
+  padding: 6px 0;
+}
+
+.day-cell {
+  height: 40px;
+  border-radius: 6px;
+  margin: 3px;
+  padding-top: 10px;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+.day-cell:hover {
+  background: #e0e0e0;
+}
+
+.climate-panel {
+  margin-top: 15px;
+  padding: 10px;
+  background: #eef5ff;
+  border-radius: 8px;
+}

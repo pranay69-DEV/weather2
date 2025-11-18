@@ -1,0 +1,63 @@
+/* 1️⃣ Line-by-line */
+.line-item {
+  margin: 6px 0;
+  font-size: 16px;
+}
+
+/* 2️⃣ Card layout */
+.hour-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hour-card {
+  width: 120px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f0f0f0;
+  text-align: center;
+}
+
+/* 3️⃣ Horizontal scroll */
+.scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 6px;
+}
+
+.scroll-card {
+  min-width: 80px;
+  padding: 8px;
+  background: #e8e8e8;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* 4️⃣ Table layout */
+.hour-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.hour-table th,
+.hour-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 5️⃣ Grid layout */
+.hour-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.grid-card {
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
