@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 import { fetchWeather } from "./api";
+
+// Pages
+import Home from "./pages/Home";
 import Today from "./pages/Today";
 import Hourly from "./pages/Hourly";
 import Day10 from "./pages/Day10";
 import Monthly from "./pages/Monthly";
 import Radar from "./pages/Radar";
 
-import Sidebar from "./components/Sidebar";
+// Components
 import ThemeToggle from "./components/ThemeToggle";
 import TempToggle from "./components/TempToggle";
 
@@ -20,68 +23,65 @@ export default function App() {
   const [unit, setUnit] = useState("C");
   const [theme, setTheme] = useState("light");
 
-  // Apply theme
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  // Fetch weather
   const load = async (c = city) => {
     setLoading(true);
     setError(null);
-
     try {
       const res = await fetchWeather(c, 5);
       setData(res);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to load data");
       setData(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // Detect user's location
-  const detectLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-
-          setCity(`${lat},${lon}`);
-          load(`${lat},${lon}`);
-        },
-        (err) => {
-          console.error("Location denied:", err);
-          load(city); // fallback
-        }
-      );
-    } else {
-      load(city);
-    }
-  };
-
-  // Load initial weather (auto location)
   useEffect(() => {
-    detectLocation();
+    load();
   }, []);
 
-  // Search submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!city) return;
     load(city);
   };
 
   return (
     <Router>
       <div className="app-layout">
-        {/* ---- SIDEBAR ---- */}
-        <Sidebar />
+        <aside className="sidebar">
+          <h2 className="side-logo">Weatherly</h2>
+          <nav className="menu">
+            <Link to="/">Home</Link>
+            <Link to="/today">Today</Link>
+            <Link to="/hourly">Hourly</Link>
+            <Link to="/day10">10-Day</Link>
+            <Link to="/monthly">Monthly</Link>
+            <Link to="/radar">Radar</Link>
+          </nav>
+        </aside>
 
         <div className="app-root">
-          {/* ---- HEADER (Theme + Temp Toggles) ---- */}
+          <div className="animated-bg" aria-hidden />
+
           <header className="header">
+            <form className="search" onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
+              <input
+                className="search-input"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Enter city (e.g. London)"
+              />
+              <button className="search-btn" type="submit">
+                Search
+              </button>
+            </form>
+
             <div className="controls">
               <TempToggle unit={unit} setUnit={setUnit} />
               <ThemeToggle theme={theme} setTheme={setTheme} />
@@ -89,41 +89,13 @@ export default function App() {
           </header>
 
           <main className="container">
-            {/* ---- SEARCH BAR ---- */}
-            <form className="search" onSubmit={handleSubmit}>
-              <input
-                className="search-input"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Enter city (e.g., London)"
-              />
-
-              <button className="search-btn">Search</button>
-
-              {/* NEW: USE MY LOCATION BUTTON */}
-              <button
-                type="button"
-                className="search-btn"
-                onClick={detectLocation}
-                style={{ marginLeft: "10px" }}
-              >
-                📍 Use My Location
-              </button>
-            </form>
-
-            {/* ---- LOADING + ERROR ---- */}
             {loading && <div className="info">Loading...</div>}
             {error && <div className="error">{error}</div>}
 
-            {/* ---- PAGES ---- */}
             <Routes>
-              <Route path="/" element={<Today data={data} unit={unit} />} />
-              <Route path="/hourly" element={<Hourly data={data} view={1} />} />
-<Route path="/hourly" element={<Hourly data={data} view={2} />} />
-<Route path="/hourly" element={<Hourly data={data} view={3} />} />
-<Route path="/hourly" element={<Hourly data={data} view={4} />} />
-<Route path="/hourly" element={<Hourly data={data} view={5} />} />
-
+              <Route path="/" element={<Home data={data} unit={unit} />} />
+              <Route path="/today" element={<Today data={data} unit={unit} />} />
+              <Route path="/hourly" element={<Hourly data={data} unit={unit} />} />
               <Route path="/day10" element={<Day10 data={data} unit={unit} />} />
               <Route path="/monthly" element={<Monthly />} />
               <Route path="/radar" element={<Radar />} />

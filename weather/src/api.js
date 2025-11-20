@@ -1,13 +1,33 @@
+// Simple WeatherAPI wrapper (forecast + current)
+const BASE = "https://api.weatherapi.com/v1";
 
-// Simple wrapper for WeatherAPI (forecast + current)
-const BASE = 'https://api.weatherapi.com/v1'
-// default key from your earlier message; replace if you want a private key
-export const KEY = '4dcf11c038b64faa8a843305250511'
+// 🔐 Use your real key
+export const KEY = "b765dffced5440019d2103442252011";
 
+// ===============================
+// ✅ FETCH CURRENT WEATHER
+// ===============================
+export async function fetchCurrent(q = "London") {
+  const url = `${BASE}/current.json?key=${KEY}&q=${encodeURIComponent(q)}&aqi=yes`;
 
-export async function fetchWeather(city = 'London', days = 5) {
-const url = `${BASE}/forecast.json?key=${KEY}&q=${encodeURIComponent(city)}&days=${days}&aqi=yes&alerts=no`
-const res = await fetch(url)
-if (!res.ok) throw new Error('Location not found')
-return res.json()
+  const res = await fetch(url);
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`WeatherAPI error: ${res.status} ${res.statusText} ${text}`);
+  }
+  return res.json();
+}
+
+// ===============================
+// ✅ FETCH FORECAST WEATHER
+// ===============================
+export async function fetchWeather(q = "London", days = 5) {
+  const url = `${BASE}/forecast.json?key=${KEY}&q=${encodeURIComponent(q)}&days=${days}&aqi=yes&lang=en`;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`WeatherAPI error: ${res.status} ${res.statusText} ${text}`);
+  }
+  return res.json();
 }
