@@ -1,52 +1,63 @@
-.monthly-wrapper {
-  max-width: 400px;
-  margin: 20px auto;
-  padding: 10px;
+.monthly-container {
   text-align: center;
+  padding: 20px;
 }
 
-.today-box {
-  background: #e6f3ff;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 8px;
+.month-title {
+  margin-bottom: 20px;
 }
 
-.month-controls button {
-  padding: 6px 12px;
-  margin: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.week-row,
-.days-grid {
+/* Calendar grid */
+.calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-top: 10px;
+  gap: 6px;
+  margin: 0 auto;
+  max-width: 450px;
 }
 
-.week-name {
+/* Weekday Header */
+.weekday {
   font-weight: bold;
-  padding: 6px 0;
-}
-
-.day-cell {
-  height: 40px;
-  border-radius: 6px;
-  margin: 3px;
-  padding-top: 10px;
-  background: #f0f0f0;
-  cursor: pointer;
-}
-
-.day-cell:hover {
-  background: #e0e0e0;
-}
-
-.climate-panel {
-  margin-top: 15px;
   padding: 10px;
-  background: #eef5ff;
+  background: var(--card-bg);
   border-radius: 8px;
+}
+
+/* Day Cell */
+.day {
+  padding: 12px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border-radius: 8px;
+}
+
+/* Highlight today's date */
+.today {
+  background: #ffdf70 !important;
+  font-weight: bold;
+  border: 2px solid #f3c300;
+}
+.day {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.day:hover {
+  background: #ffeaa7;
+  transform: scale(1.05);
+}
+
+.weather-box {
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  max-width: 350px;
+  margin-left: auto;
+  margin-right: auto;
 }

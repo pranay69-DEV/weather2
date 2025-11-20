@@ -23,13 +23,16 @@ export default function App() {
   const [unit, setUnit] = useState("C");
   const [theme, setTheme] = useState("light");
 
+  // Apply theme
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
+  // Load weather
   const load = async (c = city) => {
     setLoading(true);
     setError(null);
+
     try {
       const res = await fetchWeather(c, 5);
       setData(res);
@@ -45,15 +48,51 @@ export default function App() {
     load();
   }, []);
 
+  // Search submit
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!city) return;
     load(city);
   };
 
+  // ⭐ NEW: Use My Location
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Your browser does not support location.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        const coord = `${lat},${lon}`;
+        setCity(coord);
+
+        try {
+          const res = await fetchWeather(coord, 5);
+          setData(res);
+        } catch (err) {
+          setError("Failed to load your location weather.");
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        setError("Location permission denied.");
+        setLoading(false);
+      }
+    );
+  };
+
   return (
     <Router>
       <div className="app-layout">
+        {/* Sidebar */}
         <aside className="sidebar">
           <h2 className="side-logo">Weatherly</h2>
           <nav className="menu">
@@ -69,6 +108,7 @@ export default function App() {
         <div className="app-root">
           <div className="animated-bg" aria-hidden />
 
+          {/* Header */}
           <header className="header">
             <form className="search" onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
               <input
@@ -80,6 +120,11 @@ export default function App() {
               <button className="search-btn" type="submit">
                 Search
               </button>
+
+              {/* ⭐ NEW BUTTON */}
+              <button type="button" className="search-btn" onClick={useMyLocation}>
+                Use My Location
+              </button>
             </form>
 
             <div className="controls">
@@ -88,6 +133,7 @@ export default function App() {
             </div>
           </header>
 
+          {/* Main Content */}
           <main className="container">
             {loading && <div className="info">Loading...</div>}
             {error && <div className="error">{error}</div>}
