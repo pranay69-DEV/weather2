@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { fetchWeather } from "./api";
 
-// Pages
+// Pages (optional: you can render real data here)
 import Home from "./pages/Home";
 import Today from "./pages/Today";
 import Hourly from "./pages/Hourly";
@@ -10,24 +9,13 @@ import Day10 from "./pages/Day10";
 import Monthly from "./pages/Monthly";
 import Radar from "./pages/Radar";
 
-// Components
-import ThemeToggle from "./components/ThemeToggle";
-import TempToggle from "./components/TempToggle";
-import Welcome from "./components/Welcome"; // Import the new Welcome component
-
 export default function App() {
-  const [showWelcome, setShowWelcome] = useState(true); // NEW: Show welcome screen
+  const [active, setActive] = useState("home"); // Sidebar selection
   const [city, setCity] = useState("London");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [unit, setUnit] = useState("C");
-  const [theme, setTheme] = useState("light");
-
-  // Apply theme
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
 
   // Load weather
   const load = async (c = city) => {
@@ -46,16 +34,10 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (!showWelcome) load();
-  }, [showWelcome]);
+    load();
+  }, []);
 
-  // Search submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!city) return;
-    load(city);
-  };
-
+  // Optional: Use My Location
   const useMyLocation = () => {
     if (!navigator.geolocation) {
       setError("Your browser does not support location.");
@@ -85,73 +67,65 @@ export default function App() {
     );
   };
 
-  // NEW: Handle entering the app
-  const enterApp = () => setShowWelcome(false);
+  // Render placeholder or page content based on sidebar selection
+  const renderContent = () => {
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p className="text-danger">{error}</p>;
 
-  // ✅ Render Welcome first
-  if (showWelcome) return <Welcome onStart={enterApp} />;
+    switch (active) {
+      case "home":
+        return <Home data={data} unit={unit} />;
+      case "today":
+        return <Today data={data} unit={unit} />;
+      case "hourly":
+        return <Hourly data={data} unit={unit} />;
+      case "day10":
+        return <Day10 data={data} unit={unit} />;
+      case "monthly":
+        return <Monthly />;
+      case "radar":
+        return <Radar />;
+      default:
+        return <p>Select an option from the left menu.</p>;
+    }
+  };
 
-  // Full Weatherly app
   return (
-    <Router>
-      <div className="app-layout">
+    <div className="container-fluid">
+      <div className="row min-vh-100">
         {/* Sidebar */}
-        <aside className="sidebar">
-          <h2 className="side-logo">Weatherly</h2>
-          <nav className="menu">
-            <Link to="/">Home</Link>
-            <Link to="/today">Today</Link>
-            <Link to="/hourly">Hourly</Link>
-            <Link to="/day10">10-Day</Link>
-            <Link to="/monthly">Monthly</Link>
-            <Link to="/radar">Radar</Link>
-          </nav>
-        </aside>
+        <nav className="col-3 col-md-2 bg-dark p-3 border-end d-flex flex-column">
+          <h2 className="text-center mb-3 text-warning">Weatherly</h2>
+          {["home","today","hourly","day10","monthly","radar"].map((item) => (
+            <button
+              key={item}
+              className={`btn btn-dark text-start mb-1 ${
+                active === item ? "btn-primary" : ""
+              }`}
+              onClick={() => setActive(item)}
+            >
+              {item.charAt(0).toUpperCase() + item.slice(1)}
+            </button>
+          ))}
 
-        <div className="app-root">
-          <div className="animated-bg" aria-hidden />
+          <div className="mt-3">
+            <button className="btn btn-outline-light w-100 mb-2" onClick={useMyLocation}>
+              Use My Location
+            </button>
+            <button className="btn btn-outline-light w-100" onClick={() => load()}>
+              Reload Weather
+            </button>
+          </div>
+        </nav>
 
-          {/* Header */}
-          <header className="header">
-            <form className="search d-flex gap-2" onSubmit={handleSubmit}>
-              <input
-                className="search-input"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Enter city (e.g. London)"
-              />
-              <button className="search-btn" type="submit">
-                Search
-              </button>
-              <button type="button" className="search-btn" onClick={useMyLocation}>
-                Use My Location
-              </button>
-            </form>
-
-            <div className="controls">
-              <TempToggle unit={unit} setUnit={setUnit} />
-              <ThemeToggle theme={theme} setTheme={setTheme} />
-            </div>
-          </header>
-
-          {/* Main Content */}
-          <main className="container">
-            {loading && <div className="info">Loading...</div>}
-            {error && <div className="error">{error}</div>}
-
-            <Routes>
-              <Route path="/" element={<Home data={data} unit={unit} />} />
-              <Route path="/today" element={<Today data={data} unit={unit} />} />
-              <Route path="/hourly" element={<Hourly data={data} unit={unit} />} />
-              <Route path="/day10" element={<Day10 data={data} unit={unit} />} />
-              <Route path="/monthly" element={<Monthly />} />
-              <Route path="/radar" element={<Radar />} />
-            </Routes>
-
-            <footer className="footer">Data from WeatherAPI.com</footer>
-          </main>
-        </div>
+        {/* Main Content */}
+        <main className="col-9 col-md-10 p-4 text-light">
+          <h1 className="mb-3 text-warning">
+            {active.charAt(0).toUpperCase() + active.slice(1)}
+          </h1>
+          {renderContent()}
+        </main>
       </div>
-    </Router>
+    </div>
   );
 }
