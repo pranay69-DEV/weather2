@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
 import { fetchWeather } from "./api";
 
 // Pages
@@ -14,8 +13,10 @@ import Radar from "./pages/Radar";
 // Components
 import ThemeToggle from "./components/ThemeToggle";
 import TempToggle from "./components/TempToggle";
+import Welcome from "./components/Welcome"; // Import the new Welcome component
 
 export default function App() {
+  const [showWelcome, setShowWelcome] = useState(true); // NEW: Show welcome screen
   const [city, setCity] = useState("London");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -45,8 +46,8 @@ export default function App() {
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    if (!showWelcome) load();
+  }, [showWelcome]);
 
   // Search submit
   const handleSubmit = (e) => {
@@ -55,7 +56,6 @@ export default function App() {
     load(city);
   };
 
-  // ⭐ NEW: Use My Location
   const useMyLocation = () => {
     if (!navigator.geolocation) {
       setError("Your browser does not support location.");
@@ -67,16 +67,12 @@ export default function App() {
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-
-        const coord = `${lat},${lon}`;
+        const coord = `${pos.coords.latitude},${pos.coords.longitude}`;
         setCity(coord);
-
         try {
           const res = await fetchWeather(coord, 5);
           setData(res);
-        } catch (err) {
+        } catch {
           setError("Failed to load your location weather.");
         } finally {
           setLoading(false);
@@ -89,6 +85,13 @@ export default function App() {
     );
   };
 
+  // NEW: Handle entering the app
+  const enterApp = () => setShowWelcome(false);
+
+  // ✅ Render Welcome first
+  if (showWelcome) return <Welcome onStart={enterApp} />;
+
+  // Full Weatherly app
   return (
     <Router>
       <div className="app-layout">
@@ -110,7 +113,7 @@ export default function App() {
 
           {/* Header */}
           <header className="header">
-            <form className="search" onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
+            <form className="search d-flex gap-2" onSubmit={handleSubmit}>
               <input
                 className="search-input"
                 value={city}
@@ -120,8 +123,6 @@ export default function App() {
               <button className="search-btn" type="submit">
                 Search
               </button>
-
-              {/* ⭐ NEW BUTTON */}
               <button type="button" className="search-btn" onClick={useMyLocation}>
                 Use My Location
               </button>

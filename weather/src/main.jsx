@@ -1,11 +1,10 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App";
-import "./App.css";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx"; // Make sure your App file is App.jsx
+import "./App.css"; // Optional, if you have global styles
 
-
-createRoot(document.getElementById("root")).render(
-<React.StrictMode>
-<App />
-</React.StrictMode>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );
